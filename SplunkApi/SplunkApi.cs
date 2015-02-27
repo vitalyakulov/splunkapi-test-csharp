@@ -28,9 +28,9 @@ namespace SplunkTest
         public string BaseUrl { get { return baseUrl; } }
         private static Random _random = new Random();
 
-        public SplunkApi(string serverName, string userName, string password, int port = 8089)
+        public SplunkApi(string serverName, string userName, string password, int port = 8089, bool useSSL=true)
         {
-            this.baseUrl = string.Format("https://{0}:{1}", serverName, port);
+            this.baseUrl = useSSL ? string.Format("https://{0}:{1}", serverName, port) : string.Format("http://{0}:{1}", serverName, port);
             _userName = userName;
             _password = password;
 
@@ -118,7 +118,7 @@ namespace SplunkTest
             }
             return true;
         }
-        public XmlDocument Search(string query, bool saveResult, int upperTimeoutInMinutes)
+        public XmlDocument Search(string query, bool saveResult, int upperTimeoutInMinutes, bool showStats = true)
         {
             string searchUrl = this.baseUrl + "/services/search/jobs";
 
@@ -159,7 +159,8 @@ namespace SplunkTest
             } while (!isDone);
 
             TimeSpan elapsedTime = DateTime.Now - tStart;
-            Console.WriteLine("{0} {1} completed job {2,18}[timeout={3,3}] for '{4}', {5} results were found in {6:F2} seconds.", DateTime.Now, Thread.CurrentThread.Name, sid, searchTimeout, query, eventCount, elapsedTime.TotalSeconds);
+            if(showStats)
+                Console.WriteLine("{0} {1} completed job {2,18}[timeout={3,3}] for '{4}', {5} results were found in {6:F2} seconds.", DateTime.Now, Thread.CurrentThread.Name, sid, searchTimeout, query, eventCount, elapsedTime.TotalSeconds);
 
             // Get search results
             if (eventCount > 0)
