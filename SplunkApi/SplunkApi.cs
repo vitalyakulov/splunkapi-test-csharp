@@ -82,7 +82,8 @@ namespace SplunkTest
 
         public bool SendDataViaHttp(string token, string postData)
         {
-            WebRequest request = WebRequest.Create(this.BaseUrl + "/services/receivers/token");
+            var request = WebRequest.Create(this.BaseUrl + "/services/receivers/token") as HttpWebRequest;
+            request.KeepAlive = false;
             request.Method = "POST";
             request.Headers.Add("Authorization", "Splunk " + token);
             byte[] byteArray = Encoding.UTF8.GetBytes(postData);
@@ -112,7 +113,7 @@ namespace SplunkTest
                     }
                 }
             }
-            catch (System.Net.WebException e)
+            catch (System.Net.WebException)
             {
                 return false;
             }
@@ -180,7 +181,7 @@ namespace SplunkTest
         public XmlDocument HttpDelete(string url)
         {
             var request = WebRequest.Create(url) as HttpWebRequest;
-
+            request.KeepAlive = false;
             request.Method = "DELETE";
             request.ContentType = "application/x-www-form-urlencoded";
 
@@ -203,9 +204,10 @@ namespace SplunkTest
             }
         }
 
-        public XmlDocument HttpPost(string url, string[] paramName, string[] paramVal, string sessionKey = null)
+        public XmlDocument HttpPost(string url, string[] paramName, string[] paramVal, string sessionKey = null, bool keepAlive = true)
         {
             var request = WebRequest.Create(url) as HttpWebRequest;
+            request.KeepAlive = keepAlive;
 
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
@@ -255,6 +257,7 @@ namespace SplunkTest
         public XmlDocument HttpGet(string url)
         {
             var request = WebRequest.Create(url) as HttpWebRequest;
+            request.KeepAlive = false;
             request.Method = "GET";
             request.ContentType = "application/x-www-form-urlencoded";
 
